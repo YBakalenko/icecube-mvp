@@ -1,0 +1,37 @@
+database:
+  username: root
+  password: example
+  name: icecube
+  collection: default
+  objects:
+    preprocess_config: preprocess_config
+    train_config: train_config
+    sensor_geometry: sensor_geometry
+    metrics: metrics
+    best_params: best_params
+  fs:
+    model: model.joblib
+    study: study.joblib
+    sensor_geometry: sensor_geometry.csv
+    train_meta: train_meta_sample.parquet
+    batches: batches_sample.parquet
+
+evaluate:
+  predict_path: ./data/check/
+  predict_columns: ['pred_azimuth', 'pred_zenith']
+  file_dirs:
+    test_meta:
+      filename: test_meta.parquet
+      local_dir: ./data/check/
+    test_batch:
+      filename: batch_661.parquet
+      local_dir: ./data/check/batches/
+
+host_aliases:
+  database:
+    host:
+      alias: PREDICT_DATABASE_HOST
+      default: '127.0.0.1'
+    port:
+      alias: PREDICT_DATABASE_PORT
+      default: 27017

@@ -1,0 +1,58 @@
+version: '0.3.1'
+
+services:
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - 27017:27017
+    networks:
+      - deploy_network
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
+  train:
+    build: train/
+    depends_on:
+      - mongo
+    ports:
+      - 18507:18507
+    networks:
+      - deploy_network
+    container_name: train
+    volumes:
+        - ./data:/app/data/
+        - ./config:/app/config
+        - ./models:/app/models
+
+  predict:
+    build: predict/
+    depends_on:
+      - mongo
+    ports:
+      - 9940:9940
+    networks:
+      - deploy_network
+    container_name: predict
+    volumes:
+        - ./data:/app/data/
+        - ./config:/app/config
+
+  streamlit:
+    build: frontend/
+    depends_on:
+      - train
+      - predict
+    ports:
+        - 8080:8080
+    networks:
+      - deploy_network
+    container_name: streamlit
+    volumes:
+        - ./data:/app/data/
+        - ./config:/app/config
+
+networks:
+  deploy_network:
+    driver: bridge
