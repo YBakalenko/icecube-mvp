@@ -35,4 +35,4 @@ terraform.rc
 
 .DS_Store
 .idea
-mongo/
+icecube/mongo
