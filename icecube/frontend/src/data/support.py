@@ -5,7 +5,7 @@
 import pandas as pd
 import numpy as np
 from scipy import constants
-from requester import request_config, request_dataset
+from .requester import request_config, request_dataset
 
 
 def flatten_multiindex(df: pd.DataFrame, is_join: bool = True) -> list:

@@ -10,7 +10,7 @@ import streamlit as st
 import pandas as pd
 from http.client import responses
 from typing import Text, Any
-from get_data import read_config, dtypes_convert
+from .get_data import read_config, dtypes_convert
 
 
 def get_endpoint(url_suffix: str) -> str:

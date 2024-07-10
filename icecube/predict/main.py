@@ -3,12 +3,12 @@
 аппарата IceCube на основе метаданных прошлых исследований
 Версия: 1.3
 """
-
+import prometheus_client as pc
 import warnings
 import optuna
 import pandas as pd
 import uvicorn
-from fastapi import FastAPI, File, UploadFile, Request
+from fastapi import FastAPI, File, UploadFile, Request, Response
 
 from src.evaluate.evaluate import pipeline_evaluate
 from src.data.get_data import read_config
@@ -16,6 +16,10 @@ from src.data.database_interface import query_json, check_db_connection
 
 warnings.filterwarnings('ignore')
 optuna.logging.set_verbosity(optuna.logging.WARNING)
+
+# Define your metrics
+REQUEST_COUNT = pc.Counter('request_count_value', 'Total number of requests')
+REQUEST_LATENCY = pc.Histogram('request_latency_seconds', 'Request latency in seconds')
 
 app = FastAPI()
 
@@ -66,6 +70,13 @@ def provide_health_status() -> dict:
     """
 
     return {'backend': True, 'database': check_db_connection()}
+
+
+# Prometheus endpoint
+@app.get('/metrics')
+def metrics():
+    return Response(pc.generate_latest(),
+                    media_type=pc.CONTENT_TYPE_LATEST)
 
 
 if __name__ == '__main__':

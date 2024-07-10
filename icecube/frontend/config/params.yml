@@ -20,5 +20,5 @@ host_aliases:
       default: 9940
 
 endpoints:
-  train: ['train', 'dataset', 'config', 'verify', 'train_config', 'preprocessing_config', 'metrics', 'joblib', 'train_status', 'train_health']
+  train: ['train', 'dataset', 'config', 'verify', 'train_config', 'preprocessing_config', 'score', 'joblib', 'train_status', 'train_health']
   predict: ['predict', 'predict_input', 'evaluate_config', 'predict_health']

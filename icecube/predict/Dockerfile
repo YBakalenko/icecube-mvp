@@ -1,6 +1,6 @@
 FROM python:3.11-slim-buster
 
-WORKDIR /app/backend
+WORKDIR /app/predict
 COPY . .
 
 
@@ -16,6 +16,8 @@ RUN apt-get update && \
 RUN pip install --upgrade pip && \
     pip install --ignore-installed -r requirements.txt
 
+ENV PREDICT_DATABASE_HOST mongodb
+ENV PREDICT_DATABASE_PORT 27017
 
-EXPOSE 9940
+# EXPOSE 9940
 ENTRYPOINT ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "9940" , "--reload"]

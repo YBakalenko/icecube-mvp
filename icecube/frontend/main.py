@@ -2,6 +2,8 @@
 Программа: Frontend часть проекта
 Версия: 0.3.1
 """
+import time
+import prometheus_client as pc
 import socket
 import streamlit as st
 from random import sample
@@ -10,6 +12,15 @@ from src.data.requester import http_request, request_dataset, check_backend_heal
 from src.evaluate.evaluate import evaluate_input, evaluate_from_file
 from src.plotting.charts import sensors_3d, plot_meta, plot_charge_hist, barplot_aux, histplot_time, event_plot
 from src.train.training import start_train
+
+
+# Define your metrics
+REQUEST_COUNT = pc.Counter('request_count_value', 'Total number of requests')
+REQUEST_LATENCY = pc.Histogram('request_latency_seconds', 'Request latency in seconds')
+
+
+# Start Prometheus HTTP server
+pc.start_http_server(8001)
 
 
 def main_page():
@@ -95,6 +106,7 @@ def main_page():
             """,
             unsafe_allow_html=True
         )
+    REQUEST_COUNT.inc()
 
 
 @st.cache_data(show_spinner=False)

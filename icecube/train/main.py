@@ -1,15 +1,16 @@
 """
 Программа: Модель для предсказания направления возникновения лучей нейтрино
 аппарата IceCube на основе метаданных прошлых исследований
-Версия: 1.3
+Версия: 0.3.1
 """
+import prometheus_client as pc
 import warnings
 import optuna
 import joblib
 import io
 import uvicorn
 from http import HTTPStatus
-from fastapi import FastAPI, Response, BackgroundTasks
+from fastapi import FastAPI, Response, BackgroundTasks, Request
 from src.data.get_data import read_config, get_dataset
 from src.data.database_interface import query_joblib, check_db_connection
 from src.train.metrics import load_metrics
@@ -18,6 +19,10 @@ import src.train.train as train
 
 warnings.filterwarnings('ignore')
 optuna.logging.set_verbosity(optuna.logging.WARNING)
+
+# Define your metrics
+REQUEST_COUNT = pc.Counter('request_count_value', 'Total number of requests')
+REQUEST_LATENCY = pc.Histogram('request_latency_seconds', 'Request latency in seconds')
 
 app = FastAPI()
 
@@ -45,7 +50,7 @@ async def training(background_tasks: BackgroundTasks) -> dict:
     return training_status
 
 
-@app.get('/metrics')
+@app.get('/score')
 def provide_metrics() -> dict:
     """
     Предоставление метрик прошлого обучения модули
@@ -123,8 +128,22 @@ def provide_health_status() -> dict:
     Предоставление статуса здоровья бэкэнда и его соединения с БД
     :return: словарь со статусом здоровья бэкэнда и базы
     """
-
     return {'backend': True, 'database': check_db_connection()}
+
+
+@app.middleware("http")
+async def metrics_middleware(request: Request, call_next):
+    REQUEST_COUNT.inc()
+    with REQUEST_LATENCY.time():
+        response = await call_next(request)
+    return response
+
+
+# Prometheus endpoint
+@app.get('/metrics')
+def metrics():
+    return Response(pc.generate_latest(),
+                    media_type=pc.CONTENT_TYPE_LATEST)
 
 
 if __name__ == '__main__':

@@ -25,7 +25,7 @@ def start_train() -> None:
     Тренировка модели с выводом результатов
     """
     # Last metrics
-    old_metrics = request_json('metrics')
+    old_metrics = request_json('score')
     if old_metrics is None:
         # если до этого не обучали модель и нет прошлых значений метрик
         old_metrics = {

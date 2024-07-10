@@ -83,7 +83,7 @@ def save_metrics(score: dict) -> None:
     """
     config = read_config()
     db_cfg = config['database']
-    insert_data(db_cfg['collection'], db_cfg['objects']['metrics'], score, replace=True)
+    insert_data(db_cfg['collection'], db_cfg['objects']['score'], score, replace=True)
 
 
 def load_metrics() -> dict:
@@ -92,6 +92,6 @@ def load_metrics() -> dict:
     :return: словарь с метриками модели из файла
     """
     db_cfg = read_config()['database']
-    metrics = query_json(db_cfg['collection'], db_cfg['objects']['metrics'])
+    metrics = query_json(db_cfg['collection'], db_cfg['objects']['score'])
 
     return metrics

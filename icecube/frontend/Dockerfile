@@ -14,7 +14,11 @@ RUN pip install --upgrade pip && \
     pip install --ignore-installed -r requirements.txt
 
 
-EXPOSE 8080
+# EXPOSE 8080
+ENV TRAIN_SERVICE_HOST train
+ENV TRAIN_SERVICE_PORT 18507
+ENV PREDICT_SERVICE_HOST predict
+ENV PREDICT_SERVICE_PORT 9940
 
 ENTRYPOINT ["streamlit","run"]
 CMD ["main.py"]
