@@ -36,3 +36,4 @@ terraform.rc
 .DS_Store
 .idea
 icecube/mongo
+**/__pychache__/*
