@@ -16,7 +16,7 @@ from src.train.training import start_train
 
 def is_port_in_use(port):
     """
-    Проверка того, что Prometheus HTTP Server уже запущен 
+    Проверка того, что Prometheus HTTP Server уже запущен
     :param port: номер порта
     :retun: порт занят
     """

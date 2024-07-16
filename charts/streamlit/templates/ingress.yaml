@@ -16,4 +16,3 @@ spec:
             name: {{ template "streamlit.fullname" . }}
             port:
               number: {{ .Values.service.externalPort }}
-

@@ -89,7 +89,7 @@ alertmanager:
            <b>Description:</b> {{ .Annotations.description }}
            {{- end }}
 additionalPrometheusRulesMap:
-  rule-name:  
+  rule-name:
     groups:
     - name: icecube
       rules:

@@ -34,8 +34,7 @@ scrape_configs:
     static_configs:
       - targets:
         - 'train:18507'
-  
+
   - job_name: 'mongodb_exporter'
     static_configs:
     - targets: ['mongodb-exporter:9216']
-
