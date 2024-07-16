@@ -21,8 +21,8 @@ warnings.filterwarnings('ignore')
 optuna.logging.set_verbosity(optuna.logging.WARNING)
 
 # Define your metrics
-REQUEST_COUNT = pc.Counter('request_count_value', 'Total number of requests')
-REQUEST_LATENCY = pc.Histogram('request_latency_seconds', 'Request latency in seconds')
+REQUEST_COUNT = pc.Counter('train_request_count', 'Total number of requests')
+REQUEST_LATENCY = pc.Histogram('train_request_latency', 'Request latency in seconds')
 
 app = FastAPI()
 

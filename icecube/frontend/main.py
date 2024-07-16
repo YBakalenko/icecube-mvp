@@ -14,13 +14,19 @@ from src.plotting.charts import sensors_3d, plot_meta, plot_charge_hist, barplot
 from src.train.training import start_train
 
 
+def is_port_in_use(port):
+    """
+    Проверка того, что Prometheus HTTP Server уже запущен 
+    :param port: номер порта
+    :retun: порт занят
+    """
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        return sock.connect_ex(('localhost', port)) == 0
+
+
 # Define your metrics
-REQUEST_COUNT = pc.Counter('request_count_value', 'Total number of requests')
-REQUEST_LATENCY = pc.Histogram('request_latency_seconds', 'Request latency in seconds')
-
-
-# Start Prometheus HTTP server
-pc.start_http_server(8001)
+# REQUEST_COUNT = pc.Counter('streamlit_request_count', 'Total number of requests')
+# REQUEST_LATENCY = pc.Histogram('streamlit_request_latency', 'Request latency in seconds')
 
 
 def main_page():
@@ -106,7 +112,6 @@ def main_page():
             """,
             unsafe_allow_html=True
         )
-    REQUEST_COUNT.inc()
 
 
 @st.cache_data(show_spinner=False)
@@ -260,7 +265,13 @@ def main():
     st.sidebar.caption(f'Hostname: {socket.gethostname()}')
     selected_page = st.sidebar.selectbox('Выберите пункт', page_names_to_funcs.keys())
     page_names_to_funcs[selected_page]()
+    # REQUEST_COUNT.inc()
 
 
 if __name__ == '__main__':
+    # Start Prometheus HTTP server
+    prometheus_port = 9501
+    if not is_port_in_use(prometheus_port):
+        pc.start_http_server(prometheus_port)
+
     main()

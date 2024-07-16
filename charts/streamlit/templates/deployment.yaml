@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "streamlit.fullname" . }}
+  labels:
+    app: icecube
+    component: streamlit
+    release: {{ .Release.Name }}
+spec:
+  replicas: 3
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: icecube
+      component: streamlit
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      name: streamlit
+      labels:
+        app: icecube
+        component: streamlit
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+      - image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        name: streamlit
+        env:
+        - name: PREDICT_SERVICE_HOST
+          value: {{ .Values.predictHost | default (printf "%s-predict" .Release.Name) }}
+        - name: PREDICT_SERVICE_PORT
+          value: {{ .Values.predictPort | default "9940" | quote }}
+        - name: TRAIN_SERVICE_HOST
+          value: {{ .Values.trainHost | default (printf "%s-train" .Release.Name) }}
+        - name: TRAIN_SERVICE_PORT
+          value: {{ .Values.trainPort | default "18507" | quote }}
+        - name: ENV
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace

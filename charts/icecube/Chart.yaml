@@ -1,0 +1,6 @@
+name: icecube
+version: 0.1.0
+description: IceCube application
+maintainers:
+  - name: Yevgeny Bakalenko
+    email: yevgeny.bakalenko@gmail.com

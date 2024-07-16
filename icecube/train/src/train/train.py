@@ -19,7 +19,7 @@ from ..transform.transform import pipeline_preprocess_train
 
 
 class TrainStatus:
-    def __init__(self, stage: str = 'Not running', progress: float = 0, result: dict = {}):
+    def __init__(self, stage: str = 'Not running', progress: float = 0, result: dict = None):
         self.stage = stage
         self.progress = progress
         self.result = result

@@ -1,13 +1,11 @@
 database:
-  username: root
-  password: example
   name: icecube
   collection: default
   objects:
     preprocess_config: preprocess_config
     train_config: train_config
     sensor_geometry: sensor_geometry
-    metrics: metrics
+    score: score
     best_params: best_params
   fs:
     model: model.joblib

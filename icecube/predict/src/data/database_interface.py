@@ -25,12 +25,10 @@ def db_connection() -> pymongo.database.Database:
 
     db_host = os.getenv(host_aliases['database']['host']['alias'], host_aliases['database']['host']['default'])
     db_port = os.getenv(host_aliases['database']['port']['alias'], host_aliases['database']['port']['default'])
-    db_user = db_config['username']
-    db_password = db_config['password']
 
-    db_url = f'mongodb://{db_user}:{db_password}@{db_host}:{db_port}/'
+    db_url = f'mongodb://{db_host}:{db_port}/'
 
-    client = MongoClient(db_url, serverSelectionTimeoutMS=1000)
+    client = MongoClient(db_url, serverSelectionTimeoutMS=8000)
     db_name = db_config['name']
     db = client[db_name]
 

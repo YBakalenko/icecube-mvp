@@ -1,0 +1,18 @@
+dependencies:
+- name: streamlit
+  repository: file://../streamlit
+  version: 1.0.0
+- name: predict
+  repository: file://../predict
+  version: 1.0.0
+- name: train
+  repository: file://../train
+  version: 1.0.0
+- name: mongodb
+  repository: https://charts.helm.sh/stable
+  version: 7.8.10
+- name: prometheus-mongodb-exporter
+  repository: https://prometheus-community.github.io/helm-charts
+  version: 3.5.0
+digest: sha256:491d88e85c74a530e47cc670ef5af9a25c540f93eb8e9b1fd4517721644ca686
+generated: "2024-07-12T23:49:40.800518+03:00"

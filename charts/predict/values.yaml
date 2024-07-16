@@ -1,0 +1,9 @@
+service:
+  internalPort: 9940
+  externalPort: 9940
+
+image:
+  repository: ybakalenko/icecube-predict
+  tag: "0.3.1"
+
+databaseHost: # mongodb

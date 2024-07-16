@@ -1,0 +1,111 @@
+name: ${APP_NAME}
+services:
+  mongodb:
+    image: mongo
+    restart: always
+    volumes:
+      - mongodb:/data/db
+    networks:
+      - back_net
+    container_name: mongodb
+
+  train:
+    #platform: "linux/arm64/v8"
+    build:
+      context: ../icecube/train/
+      platforms:
+        - "linux/amd64"
+        - "linux/arm/v7"
+        - "linux/arm64/v8"
+    image: ${USERNAME}/${APP_NAME}-train:${APP_VERSION}
+    depends_on:
+      - mongodb
+    networks:
+      - back_net
+      - front_net
+    container_name: train
+
+  predict:
+    #platform: "linux/arm64/v8"
+    build:
+      context: ../icecube/predict/
+      platforms:
+        - "linux/amd64"
+        - "linux/arm/v7"
+        - "linux/arm64/v8"
+    image: ${USERNAME}/${APP_NAME}-predict:${APP_VERSION}
+    depends_on:
+      - mongodb
+    networks:
+      - back_net
+      - front_net
+    container_name: predict
+
+  streamlit:
+    #platform: "linux/arm64/v8"
+    build:
+      context: ../icecube/frontend/
+      platforms:
+        - "linux/amd64"
+        - "linux/arm/v7"
+        - "linux/arm64/v8"
+    image: ${USERNAME}/${APP_NAME}-streamlit:${APP_VERSION}
+    depends_on:
+      - train
+      - predict
+    ports:
+      - ${STREAMLIT_PORT}:8501
+    networks:
+      - front_net
+    container_name: streamlit
+
+  prometheus:
+    image: prom/prometheus
+    depends_on:
+      - streamlit
+      - train
+      - predict
+    networks:
+      - back_net
+      - front_net
+    container_name: prometheus
+    ports:
+      - ${PROMETHEUS_PORT}:9090
+    volumes:
+      - ../monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ../monitoring/alert.rules:/etc/prometheus/alert.rules
+    environment:
+      TZ: "Europe/Moscow"
+  
+  alertmanager:
+    image: prom/alertmanager
+    container_name: alertmanager
+    depends_on: 
+      - prometheus
+    restart: always
+    networks:
+      - back_net
+      - front_net
+    ports:
+      - ${ALERTMANAGER_PORT}:9093
+    volumes:
+      - ../monitoring/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+
+  mongodb_exporter:
+    image: percona/mongodb_exporter:0.20
+    networks:
+      - back_net
+      - front_net
+    container_name: mongodb-exporter
+    command:
+      - '--mongodb.uri=mongodb://mongodb:27017'
+
+volumes:
+  mongodb:
+  prometheus_data:
+
+networks:
+  front_net:
+  back_net:

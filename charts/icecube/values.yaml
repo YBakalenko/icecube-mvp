@@ -1,0 +1,34 @@
+train:
+  image:
+    repository: ybakalenko/icecube-train
+    tag: "0.3.1"
+  service:
+    externalPort: 18507
+
+predict:
+  image:
+    repository: ybakalenko/icecube-predict
+    tag: "0.3.1"
+  service:
+    externalPort: 9940
+
+streamlit:
+  image:
+    repository: ybakalenko/icecube-streamlit
+    tag: "0.3.1"
+  service:
+    externalPort: 8501
+
+databaseHost: mongodb
+
+mongodb:
+  usePassword: false
+
+prometheus-mongodb-exporter:
+  mongodb:
+    uri: "mongodb://mongodb:27017"
+
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9216"
+    prometheus.io/path: /metrics

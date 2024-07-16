@@ -36,7 +36,7 @@ def get_endpoint(url_suffix: str) -> str:
 def http_request(kind: str,
                  service: str,
                  exit_on_error: bool = True,
-                 timeout: int = 3000,
+                 timeout: int = 8000,
                  param_name: str = None,
                  json: Any = None,
                  files: dict = None) -> requests.Response:
