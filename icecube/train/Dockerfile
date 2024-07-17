@@ -1,9 +1,8 @@
-FROM python:3.11-slim-buster
+FROM python:3.12-slim-bookworm
 
 WORKDIR /app
-#/train
-COPY . .
 
+COPY . .
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -11,11 +10,12 @@ RUN apt-get update && \
         cmake \
         build-essential \
         gcc \
-        g++
-
-
-RUN pip install --upgrade pip && \
-    pip install --ignore-installed -r requirements.txt
+        g++ \
+        ninja-build && \
+    pip install --upgrade pip && \
+    pip install --ignore-installed -r requirements.txt && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 ENV TRAIN_DATABASE_HOST=mongodb
 ENV TRAIN_DATABASE_PORT=27017

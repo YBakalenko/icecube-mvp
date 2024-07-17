@@ -1,19 +1,19 @@
-FROM python:3.11-slim-buster
+FROM python:3.12-slim-bookworm
 
 WORKDIR /app
-#/frontend
-COPY . .
 
+COPY . .
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         cmake \
         build-essential \
-        gcc
-
-RUN pip install --upgrade pip && \
-    pip install --ignore-installed -r requirements.txt
-
+        gcc \
+        ninja-build && \
+    pip install --upgrade pip && \
+    pip install --ignore-installed -r requirements.txt && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # EXPOSE 8080
 ENV TRAIN_SERVICE_HOST=train

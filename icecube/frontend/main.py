@@ -24,9 +24,12 @@ def is_port_in_use(port):
         return sock.connect_ex(('localhost', port)) == 0
 
 
-# Define your metrics
-# REQUEST_COUNT = pc.Counter('streamlit_request_count', 'Total number of requests')
-# REQUEST_LATENCY = pc.Histogram('streamlit_request_latency', 'Request latency in seconds')
+# Start Prometheus HTTP server
+prometheus_port = 9501
+print(f'Attempting to start Prometheus HTTP server')
+if not is_port_in_use(prometheus_port):
+    pc.start_http_server(prometheus_port)
+    print(f'Prometheus HTTP server started at port {prometheus_port}')
 
 
 def main_page():
@@ -269,9 +272,4 @@ def main():
 
 
 if __name__ == '__main__':
-    # Start Prometheus HTTP server
-    prometheus_port = 9501
-    if not is_port_in_use(prometheus_port):
-        pc.start_http_server(prometheus_port)
-
     main()

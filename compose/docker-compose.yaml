@@ -10,13 +10,7 @@ services:
     container_name: mongodb
 
   train:
-    #platform: "linux/arm64/v8"
-    build:
-      context: ../icecube/train/
-      platforms:
-        - "linux/amd64"
-        - "linux/arm/v7"
-        - "linux/arm64/v8"
+    build: ../icecube/train/
     image: ${USERNAME}/${APP_NAME}-train:${APP_VERSION}
     depends_on:
       - mongodb
@@ -26,13 +20,7 @@ services:
     container_name: train
 
   predict:
-    #platform: "linux/arm64/v8"
-    build:
-      context: ../icecube/predict/
-      platforms:
-        - "linux/amd64"
-        - "linux/arm/v7"
-        - "linux/arm64/v8"
+    build: ../icecube/predict/
     image: ${USERNAME}/${APP_NAME}-predict:${APP_VERSION}
     depends_on:
       - mongodb
@@ -42,13 +30,7 @@ services:
     container_name: predict
 
   streamlit:
-    #platform: "linux/arm64/v8"
-    build:
-      context: ../icecube/frontend/
-      platforms:
-        - "linux/amd64"
-        - "linux/arm/v7"
-        - "linux/arm64/v8"
+    platform: ../icecube/frontend/
     image: ${USERNAME}/${APP_NAME}-streamlit:${APP_VERSION}
     depends_on:
       - train
