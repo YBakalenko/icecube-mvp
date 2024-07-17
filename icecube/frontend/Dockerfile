@@ -21,5 +21,4 @@ ENV TRAIN_SERVICE_PORT=18507
 ENV PREDICT_SERVICE_HOST=predict
 ENV PREDICT_SERVICE_PORT=9940
 
-ENTRYPOINT ["streamlit","run"]
-CMD ["main.py"]
+ENTRYPOINT ["streamlit", "run", "main.py", "--server.port=8501", "--server.address=0.0.0.0"]

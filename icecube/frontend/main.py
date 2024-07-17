@@ -2,8 +2,8 @@
 Программа: Frontend часть проекта
 Версия: 0.3.1
 """
-import time
-import prometheus_client as pc
+#import time
+#import prometheus_client as pc
 import socket
 import streamlit as st
 from random import sample
@@ -14,22 +14,22 @@ from src.plotting.charts import sensors_3d, plot_meta, plot_charge_hist, barplot
 from src.train.training import start_train
 
 
-def is_port_in_use(port):
-    """
-    Проверка того, что Prometheus HTTP Server уже запущен
-    :param port: номер порта
-    :retun: порт занят
-    """
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-        return sock.connect_ex(('localhost', port)) == 0
+# def is_port_in_use(port):
+#     """
+#     Проверка того, что Prometheus HTTP Server уже запущен
+#     :param port: номер порта
+#     :retun: порт занят
+#     """
+#     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+#         return sock.connect_ex(('localhost', port)) == 0
 
 
 # Start Prometheus HTTP server
-prometheus_port = 9501
-print(f'Attempting to start Prometheus HTTP server')
-if not is_port_in_use(prometheus_port):
-    pc.start_http_server(prometheus_port)
-    print(f'Prometheus HTTP server started at port {prometheus_port}')
+# prometheus_port = 9501
+# print(f'Attempting to start Prometheus HTTP server')
+# if not is_port_in_use(prometheus_port):
+#     pc.start_http_server(prometheus_port)
+#     print(f'Prometheus HTTP server started at port {prometheus_port}')
 
 
 def main_page():
