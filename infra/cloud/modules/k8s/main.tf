@@ -85,6 +85,6 @@ resource "yandex_kubernetes_node_group" "node-group" {
 resource "terraform_data" "export_kubeconfig" {
   depends_on = [yandex_kubernetes_node_group.node-group]
   provisioner "local-exec" {
-    command = "bash ${path.module}/scripts/export_kubeconfig.sh"
+    command = "yc managed-kubernetes cluster get-credentials k8s-cluster --external --force"
   }
 }

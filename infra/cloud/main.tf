@@ -19,14 +19,3 @@ module "k8s" {
   sa_id           = var.sa_id
   ssh_key_path    = var.ssh_key_path
 }
-
-module "nginx" {
-  source          = "./modules/nginx"
-  depends_on      = [module.k8s]
-}
-
-module "gitlab" {
-  source          = "./modules/gitlab"
-  depends_on      = [module.nginx]
-  gitlab_domain   = var.gitlab_domain
-}

@@ -1,4 +1,4 @@
-gitlabUrl: https://gitlab.${gitlab_domain}/
+gitlabUrl: https://${gitlab_host}/
 
 runnerRegistrationToken: "${runner_token}"
 
@@ -11,7 +11,7 @@ checkInterval: 30
 hostAliases:
   - ip: "${gitlab_ip}"
     hostnames:
-    - "gitlab.${gitlab_domain}"
+    - "${gitlab_host}"
 
 serviceAccount:
   create: true
