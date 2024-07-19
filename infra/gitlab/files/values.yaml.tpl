@@ -45,5 +45,5 @@ runners:
     [[runners]]
       [runners.kubernetes]
         tls_verify = false
-        image = "docker:19"
+        image = "docker:27.0.3" # docker:19
         privileged = true

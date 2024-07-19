@@ -35,9 +35,16 @@ override.tf.json
 terraform.rc
 
 .DS_Store
+
+# Ignore PyCharm auxiliaries
 .idea/
-icecube/mongo
 __pycache__/
+
+# Yandex Service Account creds
 key.json
+
+# Various temporary lock files
 *.lock
+
+# Helm chart archives (need to be updated manually via helm dep update)
 *.tgz
