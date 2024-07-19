@@ -10,7 +10,8 @@ metadata:
 spec:
   type: NodePort
   ports:
-  - port: {{ .Values.service.externalPort }}
+  - name: streamlit
+    port: {{ .Values.service.externalPort }}
     protocol: TCP
     targetPort: {{ .Values.service.internalPort }}
   selector:

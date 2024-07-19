@@ -19,16 +19,15 @@ streamlit:
   service:
     externalPort: 8501
 
-databaseHost: mongodb
+# databaseHost: mongodb
 
 mongodb:
   usePassword: false
 
-prometheus-mongodb-exporter:
-  mongodb:
-    uri: "mongodb://mongodb:27017"
-
-  podAnnotations:
-    prometheus.io/scrape: "true"
-    prometheus.io/port: "9216"
-    prometheus.io/path: /metrics
+# prometheus-mongodb-exporter:
+#   mongodb:
+#     uri: "mongodb://icecube-mongodb:27017"
+#   serviceMonitor:
+#     enabled: true
+#     additionalLabels:
+#       release: prometheus

@@ -27,9 +27,3 @@ variable "ssh_key_path" {
   description = "SSH key file path for k8s access"
   type = string
 }
-
-variable gitlab_domain {
-  description = "Gitalb Domain name"
-  type        = string
-  default     = "example.com"
-}

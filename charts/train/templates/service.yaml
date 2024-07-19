@@ -9,7 +9,8 @@ metadata:
     release: {{ .Release.Name }}
 spec:
   ports:
-  - port: {{ .Values.service.externalPort }}
+  - name: train
+    port: {{ .Values.service.externalPort }}
     protocol: TCP
     targetPort: {{ .Values.service.internalPort }}
   selector:

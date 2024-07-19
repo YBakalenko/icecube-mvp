@@ -11,8 +11,5 @@ dependencies:
 - name: mongodb
   repository: https://charts.helm.sh/stable
   version: 7.8.10
-- name: prometheus-mongodb-exporter
-  repository: https://prometheus-community.github.io/helm-charts
-  version: 3.5.0
-digest: sha256:491d88e85c74a530e47cc670ef5af9a25c540f93eb8e9b1fd4517721644ca686
-generated: "2024-07-12T23:49:40.800518+03:00"
+digest: sha256:cae73fd1c7cd848be9bf6792f116e5f4d8eef84f589778e240f97fdcbc37d159
+generated: "2024-07-19T18:20:19.629853+03:00"

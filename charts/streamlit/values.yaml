@@ -13,4 +13,4 @@ trainPort:
 
 ingress:
   class: nginx
-  host:
+  host: icecube.example.com

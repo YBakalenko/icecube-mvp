@@ -1,111 +1,98 @@
-# Prometheus Server Configuration
-prometheus:
-  ingress:
-    enabled: true
-    # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
-    # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
-    ingressClassName: nginx
-
-    ## Redirect ingress to an additional defined port on the service
-    # servicePort: 8081
-    ## Hostnames.
-    ## Must be provided if Ingress is enabled.
-    ##
-    hosts:
+kube-prometheus-stack:
+  # Prometheus Server Configuration
+  prometheus:
+    ingress:
+      enabled: true
+      ingressClassName: nginx
+      hosts:
       - prometheus.example.com
-    # hosts: []
-    ## Paths to use for ingress rules - one path should match the prometheusSpec.routePrefix
-    ##
-    paths:
-    - /
-    ## For Kubernetes >= 1.18 you should specify the pathType (determines how Ingress paths should be matched)
-    ## See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#better-path-matching-with-path-types
-    pathType: ImplementationSpecific
-  prometheusSpec:
-    additionalScrapeConfigs:
-      - job_name: 'kubernetes-pods'
-        kubernetes_sd_configs:
-          - role: pod
-        relabel_configs:
-          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
-            action: keep
-            regex: true
-          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
-            action: replace
-            target_label: __metrics_path__
-            regex: (.+)
-          - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
-            action: replace
-            regex: ([^:]+)(?::\d+)?;(\d+)
-            replacement: $1:$2
-            target_label: __address__
-          - action: labelmap
-            regex: __meta_kubernetes_pod_label_(.+)
-          - source_labels: [__meta_kubernetes_namespace]
-            action: replace
-            target_label: kubernetes_namespace
-          - source_labels: [__meta_kubernetes_pod_name]
-            action: replace
-            target_label: kubernetes_pod_name
-# Alertmanager Configuration
-alertmanager:
-  config:
-  global:
-    telegram_api_url: "https://api.telegram.org"
-  route:
-    receiver: telegram-alert
-    group_by: ['alertname', 'cluster', 'service']
-    repeat_interval: 1h
-    routes:
-      - match:
-          severity: critical
-        receiver: telegram-alert
-        continue: true
-  receivers:
-    - name: telegram-alert
-      telegram_configs:
-        - chat_id: 1399476130
-          bot_token: 7334316533:AAEDbolcgf_h7YFvmFKqtIkD7uAJYe-54_4
-          api_url: "https://api.telegram.org"
-          send_resolved: true
-          parse_mode: html
-          template: |-
-           {{ define "telegram.default" }}
-           {{ range .Alerts }}
-           {{ if eq .Status "firing"}}&#x1F525<b>{{ .Status | toUpper }}</b>&#x1F525{{ else }}&#x2705<b>{{ .Status | toUpper }}</b>&#x2705{{ end }}
-           <b>{{ .Labels.alertname }}</b>
-           {{- if .Labels.severity }}
-           <b>Severity:</b> {{ .Labels.severity }}
-           {{- end }}
-           {{- if .Labels.cluster }}
-           <b>Cluster:</b> {{ .Labels.cluster }}
-           {{- end }}
-           {{- if .Labels.service }}
-           <b>Service:</b> {{ .Labels.service }}
-           {{- end }}
-           {{- if .Labels.instance}}
-           <b>Instance:</b> {{ .Labels.instance }}
-           {{- end }}
-           <b>Description:</b> {{ .Annotations.description }}
-           {{- end }}
-additionalPrometheusRulesMap:
-  rule-name:
-    groups:
-    - name: icecube
-      rules:
-      # Alert for any instance that is unreachable for >1 minute.
-      - alert: InstanceDown
-        expr: up == 0
-        for: 1m
-        labels:
-          severity: page
-        annotations:
-          summary: "Instance {{ $labels.instance }} down"
-          description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 1 minute."
-      # Alert for any instance that has a median request latency >1s.
-      - alert: APIHighRequestLatency
-        expr: api_http_request_latencies_second{quantile="0.5"} > 1
-        for: 10m
-        annotations:
-          summary: "High request latency on {{ $labels.instance }}"
-          description: "{{ $labels.instance }} has a median request latency above 1s (current value: {{ $value }}s)"
+      paths:
+      - /
+      pathType: ImplementationSpecific
+    additionalServiceMonitors:
+    - name: icecube-streamlit
+      additionalLabels:
+        release: prometheus
+      selector:
+        matchLabels:
+          app: icecube
+          component: streamlit
+      endpoints:
+      - port: streamlit
+        path: /_stcore/metrics
+    - name: icecube-predict
+      additionalLabels:
+        release: prometheus
+      selector:
+        matchLabels:
+          app: icecube
+          component: predict
+      endpoints:
+      - port: predict
+        path: /metrics
+    - name: icecube-train
+      additionalLabels:
+        release: prometheus
+      selector:
+        matchLabels:
+          app: icecube
+          component: train
+      endpoints:
+      - port: train
+        path: /metrics
+  kubeProxy:
+    enabled: false
+
+  # Alertmanager Configuration
+  alertmanager:
+    config:
+      global:
+        telegram_api_url: "https://api.telegram.org"
+        resolve_timeout: 10s
+      route:
+        receiver: 'default-receiver'
+        group_by: [alertname, cluster, service]
+        group_wait: 3s
+        repeat_interval: 1h
+        routes:
+        # - receiver: 'null'
+        #   matchers:
+        #   - alertname = "Watchdog"
+        - receiver: 'icecube-user'
+          matchers:
+          - severity="critical"
+      receivers:
+      - name: 'null'
+      - name: 'default-receiver'
+      - name: 'icecube-user'
+        telegram_configs:
+          - chat_id: 1399476130
+            bot_token: '7334316533:AAEDbolcgf_h7YFvmFKqtIkD7uAJYe-54_4'
+            message: '{{ template "telegram.default.message" . }}'
+    ingress:
+      enabled: true
+      ingressClassName: nginx
+      hosts:
+      - alertmanager.example.com
+      paths:
+      - /
+      pathType: ImplementationSpecific
+
+  # Grafana Configuration
+  grafana:
+    ingress:
+      enabled: true
+      ingressClassName: nginx
+      hosts:
+        - grafana.example.com
+      paths:
+      - /
+      pathType: ImplementationSpecific
+
+prometheus-mongodb-exporter:
+  mongodb:
+    uri: "mongodb://icecube-mongodb:27017"
+  serviceMonitor:
+    enabled: true
+    additionalLabels:
+      release: prometheus

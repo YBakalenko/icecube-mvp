@@ -1,0 +1,9 @@
+dependencies:
+- name: kube-prometheus-stack
+  repository: https://prometheus-community.github.io/helm-charts
+  version: 61.3.2
+- name: prometheus-mongodb-exporter
+  repository: https://prometheus-community.github.io/helm-charts
+  version: 3.5.0
+digest: sha256:5509db81febcfce282669e13c2c022938ecae53da489832ed6accbe04c7d3e64
+generated: "2024-07-19T18:20:41.235815+03:00"
