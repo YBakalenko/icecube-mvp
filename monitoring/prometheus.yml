@@ -20,11 +20,11 @@ scrape_configs:
       - targets:
         - 'localhost:9090'
 
-  - job_name: 'streamlit'
+  - job_name: 'frontend'
     metrics_path: /_stcore/metrics
     static_configs:
       - targets:
-        - 'streamlit:8501'
+        - 'frontend:8501'
 
   - job_name: 'predict'
     static_configs:

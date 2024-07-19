@@ -1,9 +1,0 @@
-service:
-  internalPort: 18507
-  externalPort: 18507
-
-image:
-  repository: ybakalenko/icecube-train
-  tag: "0.3.1"
-
-databaseHost: # mongodb

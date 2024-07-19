@@ -29,22 +29,22 @@ services:
       - front_net
     container_name: predict
 
-  streamlit:
+  frontend:
     build: ../icecube/frontend/
-    image: ${USERNAME}/${APP_NAME}-streamlit:${APP_VERSION}
+    image: ${USERNAME}/${APP_NAME}-frontend:${APP_VERSION}
     depends_on:
       - train
       - predict
     ports:
-      - ${STREAMLIT_PORT}:8501
+      - ${FRONTEND_PORT}:8501
     networks:
       - front_net
-    container_name: streamlit
+    container_name: frontend
 
   prometheus:
     image: prom/prometheus
     depends_on:
-      - streamlit
+      - frontend
       - train
       - predict
     networks:

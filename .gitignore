@@ -39,3 +39,5 @@ terraform.rc
 icecube/mongo
 __pycache__/
 key.json
+*.lock
+*.tgz

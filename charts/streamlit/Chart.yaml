@@ -1,7 +1,0 @@
-name: streamlit
-version: 1.0.0
-description: IceCube application UI
-maintainers:
-  - name: Yevgeny Bakalenko
-    email: yevgeny.bakalenko@gmail.com
-appVersion: 0.3.1
