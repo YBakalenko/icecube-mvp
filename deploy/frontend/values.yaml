@@ -1,0 +1,16 @@
+service:
+  internalPort: 8501
+  externalPort: 8501
+
+image:
+  repository: ybakalenko/icecube-frontend
+  tag: "0.3.1"
+
+predictHost:
+predictPort:
+trainHost:
+trainPort:
+
+ingress:
+  class: nginx
+  host: icecube.example.com

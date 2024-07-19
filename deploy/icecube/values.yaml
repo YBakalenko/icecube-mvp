@@ -1,0 +1,25 @@
+train:
+  image:
+    repository: ybakalenko/icecube-train
+    tag: "0.3.1"
+  service:
+    externalPort: 18507
+
+predict:
+  image:
+    repository: ybakalenko/icecube-predict
+    tag: "0.3.1"
+  service:
+    externalPort: 9940
+
+frontend:
+  image:
+    repository: ybakalenko/icecube-frontend
+    tag: "0.3.1"
+  service:
+    externalPort: 8501
+
+# databaseHost: mongodb
+
+mongodb:
+  usePassword: false

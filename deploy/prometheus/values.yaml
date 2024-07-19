@@ -1,0 +1,98 @@
+kube-prometheus-stack:
+  # Prometheus Server Configuration
+  prometheus:
+    ingress:
+      enabled: true
+      ingressClassName: nginx
+      hosts:
+      - prometheus.example.com
+      paths:
+      - /
+      pathType: ImplementationSpecific
+    additionalServiceMonitors:
+    - name: icecube-frontend
+      additionalLabels:
+        release: prometheus
+      selector:
+        matchLabels:
+          app: icecube
+          component: frontend
+      endpoints:
+      - port: frontend
+        path: /_stcore/metrics
+    - name: icecube-predict
+      additionalLabels:
+        release: prometheus
+      selector:
+        matchLabels:
+          app: icecube
+          component: predict
+      endpoints:
+      - port: predict
+        path: /metrics
+    - name: icecube-train
+      additionalLabels:
+        release: prometheus
+      selector:
+        matchLabels:
+          app: icecube
+          component: train
+      endpoints:
+      - port: train
+        path: /metrics
+  kubeProxy:
+    enabled: false
+
+  # Alertmanager Configuration
+  alertmanager:
+    config:
+      global:
+        telegram_api_url: "https://api.telegram.org"
+        resolve_timeout: 10s
+      route:
+        receiver: 'default-receiver'
+        group_by: [alertname, cluster, service]
+        group_wait: 3s
+        repeat_interval: 1h
+        routes:
+        # - receiver: 'null'
+        #   matchers:
+        #   - alertname = "Watchdog"
+        - receiver: 'icecube-user'
+          matchers:
+          - severity="critical"
+      receivers:
+      - name: 'null'
+      - name: 'default-receiver'
+      - name: 'icecube-user'
+        telegram_configs:
+          - chat_id: 1399476130
+            bot_token: '7334316533:AAEDbolcgf_h7YFvmFKqtIkD7uAJYe-54_4'
+            message: '{{ template "telegram.default.message" . }}'
+    ingress:
+      enabled: true
+      ingressClassName: nginx
+      hosts:
+      - alertmanager.example.com
+      paths:
+      - /
+      pathType: ImplementationSpecific
+
+  # Grafana Configuration
+  grafana:
+    ingress:
+      enabled: true
+      ingressClassName: nginx
+      hosts:
+        - grafana.example.com
+      paths:
+      - /
+      pathType: ImplementationSpecific
+
+prometheus-mongodb-exporter:
+  mongodb:
+    uri: "mongodb://icecube-mongodb:27017"
+  serviceMonitor:
+    enabled: true
+    additionalLabels:
+      release: prometheus

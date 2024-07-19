@@ -1,0 +1,7 @@
+name: prometheus-stack
+version: 0.1.0
+description: Prometheus stack monitoring system for IceCube application
+maintainers:
+  - name: Yevgeny Bakalenko
+    email: yevgeny.bakalenko@gmail.com
+appVersion: 0.1.1

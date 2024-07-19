@@ -1,0 +1,30 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "predict.fullname" . }}
+  labels:
+    app: icecube
+    component: predict
+    release: {{ .Release.Name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: icecube
+      component: predict
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      name: predict
+      labels:
+        app: icecube
+        component: predict
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+      - image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        name: predict
+        env:
+        - name: PREDICT_DATABASE_HOST
+          value: {{ .Values.databaseHost | default (printf "%s-mongodb" .Release.Name) }}

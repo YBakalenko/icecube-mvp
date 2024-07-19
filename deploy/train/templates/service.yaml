@@ -1,0 +1,19 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "train.fullname" . }}
+  labels:
+    app: icecube
+    component: train
+    release: {{ .Release.Name }}
+spec:
+  ports:
+  - name: train
+    port: {{ .Values.service.externalPort }}
+    protocol: TCP
+    targetPort: {{ .Values.service.internalPort }}
+  selector:
+    app: icecube
+    component: train
+    release: {{ .Release.Name }}

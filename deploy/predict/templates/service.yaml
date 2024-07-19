@@ -1,0 +1,19 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "predict.fullname" . }}
+  labels:
+    app: icecube
+    component: predict
+    release: {{ .Release.Name }}
+spec:
+  ports:
+  - name: predict
+    port: {{ .Values.service.externalPort }}
+    protocol: TCP
+    targetPort: {{ .Values.service.internalPort }}
+  selector:
+    app: icecube
+    component: predict
+    release: {{ .Release.Name }}

@@ -1,0 +1,20 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "frontend.fullname" . }}
+  labels:
+    app: icecube
+    component: frontend
+    release: {{ .Release.Name }}
+spec:
+  type: NodePort
+  ports:
+  - name: frontend
+    port: {{ .Values.service.externalPort }}
+    protocol: TCP
+    targetPort: {{ .Values.service.internalPort }}
+  selector:
+    app: icecube
+    component: frontend
+    release: {{ .Release.Name }}
