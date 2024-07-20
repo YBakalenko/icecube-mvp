@@ -1,51 +1,11 @@
 provider "helm" {
   kubernetes {
-    config_path    = "~/.kube/config"  # Path to your kubeconfig file
+    config_path = "~/.kube/config" # Path to your kubeconfig file
   }
 }
 
 provider "kubernetes" {
-  config_path    = "~/.kube/config"
-}
-
-# These roles will be required for Gitlab runner to create, modify, delete namespaces, pods etc:
-resource "kubernetes_cluster_role_v1" "namespace_admin" {
-  metadata {
-    name = "namespace-admin"
-  }
-
-  rule {
-    api_groups = [""]
-    resources  = ["namespaces", "resourcequotas", "limitranges", "secrets", "persistentvolumes", "persistentvolumeclaims", "services"]
-    verbs      = ["get", "create", "list", "watch", "delete"]
-  }
-  rule {
-    api_groups = ["networking.k8s.io"]
-    resources  = ["networkpolicies", "ingresses"]
-    verbs      = ["get", "create", "list", "watch"]
-  }
-  rule {
-    api_groups = ["apps"]
-    resources  = ["deployments", "replicasets"]
-    verbs      = ["get", "create", "list", "watch"]
-  }
-}
-
-resource "kubernetes_cluster_role_binding_v1" "namespace_admin_binding" {
-  depends_on = [kubernetes_cluster_role_v1.namespace_admin]
-  metadata {
-    name = "namespace-admin-binding"
-  }
-  role_ref {
-    api_group = "rbac.authorization.k8s.io"
-    kind      = "ClusterRole"
-    name      = "namespace-admin"
-  }
-  subject {
-    kind      = "ServiceAccount"
-    name      = "default"
-    api_group = ""
-  }
+  config_path = "~/.kube/config"
 }
 
 data "kubernetes_service_v1" "gitlab_ip" {
@@ -62,69 +22,83 @@ data "kubernetes_ingress_v1" "gitlab_host" {
   }
 }
 
-locals {
-  runner_values_yaml_content           = templatefile("${path.module}/files/values.yaml.tpl", {
-    gitlab_host                        = data.kubernetes_ingress_v1.gitlab_host.spec.0.tls.0.hosts.0
-    gitlab_ip                          = data.kubernetes_service_v1.gitlab_ip.status.0.load_balancer.0.ingress.0.ip
-    runner_token                       = var.runner_token
-  })
+# These roles will be required for Gitlab runner to create, modify, delete namespaces, pods etc:
+module "roles" {
+  source = "./modules/roles"
 }
 
-resource "helm_release" "gitlab_runner" {
-  name       = "gitlab-runner"
-  repository = "https://charts.gitlab.io"
-  chart      = "gitlab-runner"
-  version    = "0.66.0"
-  namespace  = "gitlab"
-
-  values = [local.runner_values_yaml_content]
+provider "gitlab" {
+  base_url = "https://${data.kubernetes_ingress_v1.gitlab_host.spec[0].tls[0].hosts[0]}/"
+  # https://gitlab.example.com/
+  token    = var.gitlab_token
+  insecure = "true"
 }
 
-data "kubernetes_ingress_v1" "kas_host" {
-  metadata {
-    name      = "gitlab-kas"
-    namespace = "gitlab"
-  }
+resource "gitlab_group" "my_group" {
+  name             = var.username
+  path             = var.username
+  description      = "My CI/CD group"
+  visibility_level = "public"
 }
 
-data "kubernetes_secret_v1" "gitlab_ca_cert" {
-  metadata {
-    name      = "gitlab-wildcard-tls-ca"
-    namespace = "gitlab"
-  }
+module "runner" {
+  gitlab_ip     = data.kubernetes_service_v1.gitlab_ip.status[0].load_balancer[0].ingress[0].ip
+  gitlab_host   = data.kubernetes_ingress_v1.gitlab_host.spec[0].tls[0].hosts[0]
+  runners_token = gitlab_group.my_group.runners_token
+  source        = "./modules/runner"
 }
 
-resource "helm_release" "kube-agent" {
-  name             = "kube-agent"
-  repository       = "https://charts.gitlab.io/"
-  chart            = "gitlab-agent"
-  version          = "2.4.0"
-  namespace        = "gitlab-agent-kube-agent"
-  create_namespace = "true"
+resource "gitlab_project" "projects" {
+  for_each         = toset(var.project_names)
+  name             = each.key
+  visibility_level = "public"
+  description      = "${each.key} CI/CD project"
+  namespace_id     = gitlab_group.my_group.id
+}
 
-  set {
-    name  = "image.tag"
-    value = "v17.1.2"
-  }
-  set {
-    name  = "config.token"
-    value = "${var.agent_token}"
-  }
-  set {
-    name  = "config.kasAddress"
-    value = "wss://${data.kubernetes_ingress_v1.kas_host.spec.0.tls.0.hosts.0}"
-  }
-  set {
-    name  = "config.kasCaCert"
-    value = "${data.kubernetes_secret_v1.gitlab_ca_cert.data.cfssl_ca}"
-  }
-  set {
-    name  = "hostAliases[0].ip"
-    value = "${data.kubernetes_service_v1.gitlab_ip.status.0.load_balancer.0.ingress.0.ip}"
-  }
-  set {
-    name  = "hostAliases[0].hostnames[0]"
-    value = "${data.kubernetes_ingress_v1.kas_host.spec.0.tls.0.hosts.0}"
-  }
+module "kas_agents" {
+  for_each     = gitlab_project.projects
+  project_id   = gitlab_project.projects[each.key].id # "${each.key}"
+  project_name = gitlab_project.projects[each.key].name # "${each.key}"
+  source       = "./modules/agent"
+}
 
+resource "gitlab_group_variable" "ci_registry_user" {
+  depends_on        = [gitlab_group.my_group]
+  group             = var.username
+  key               = "CI_REGISTRY_USER"
+  value             = var.username
+  protected         = false
+  masked            = false
+  environment_scope = "*"
+}
+
+resource "gitlab_group_variable" "ci_registry_password" {
+  depends_on        = [gitlab_group.my_group]
+  group             = var.username
+  key               = "CI_REGISTRY_PASSWORD"
+  value             = var.password
+  protected         = true
+  masked            = false
+  environment_scope = "*"
+}
+
+resource "gitlab_group_variable" "ci_gitlab_ip" {
+  depends_on        = [gitlab_group.my_group]
+  group             = var.username
+  key               = "CI_GITLAB_IP"
+  value             = data.kubernetes_service_v1.gitlab_ip.status[0].load_balancer[0].ingress[0].ip
+  protected         = false
+  masked            = false
+  environment_scope = "*"
+}
+
+resource "gitlab_group_variable" "ci_gitlab_host" {
+  depends_on        = [gitlab_group.my_group]
+  group             = var.username
+  key               = "CI_GITLAB_HOST"
+  value             = data.kubernetes_ingress_v1.gitlab_host.spec[0].tls[0].hosts[0]
+  protected         = false
+  masked            = false
+  environment_scope = "*"
 }

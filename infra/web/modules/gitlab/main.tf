@@ -7,7 +7,7 @@ resource "helm_release" "gitlab" {
   create_namespace = "true"
   wait             = "true"
   wait_for_jobs    = "true"
-  timeout          = "600"
+  timeout          = "1200"
 
   set {
     name  = "global.edition"
@@ -42,7 +42,6 @@ data "kubernetes_secret_v1" "gitlab_root_password" {
 # Wait for 60 sec to obtain LoadBalancer IP
 resource "time_sleep" "gitlab_nginx_lb_wait" {
   depends_on = [helm_release.gitlab]
-
   create_duration = "60s"
 }
 

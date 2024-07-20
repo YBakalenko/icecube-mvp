@@ -20,10 +20,11 @@ variable "folder_id" {
 
 variable "zone" {
   description = "Yandex Cloud zone name"
-  default = "ru-central1"
+  default     = "ru-central1"
+  type        = string
 }
 
 variable "ssh_key_path" {
   description = "SSH key file path for k8s access"
-  type = string
+  type        = string
 }

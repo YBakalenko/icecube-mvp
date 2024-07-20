@@ -90,6 +90,7 @@ kube-prometheus-stack:
       pathType: ImplementationSpecific
 
 prometheus-mongodb-exporter:
+  nameOverride: icecube-prometheus-mongodb-exporter
   mongodb:
     uri: "mongodb://icecube-mongodb:27017"
   serviceMonitor:
