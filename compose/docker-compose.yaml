@@ -54,8 +54,8 @@ services:
     ports:
       - ${PROMETHEUS_PORT}:9090
     volumes:
-      - ../monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
-      - ../monitoring/alert.rules:/etc/prometheus/alert.rules
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./monitoring/alert.rules:/etc/prometheus/alert.rules
     environment:
       TZ: "Europe/Moscow"
 
@@ -71,7 +71,7 @@ services:
     ports:
       - ${ALERTMANAGER_PORT}:9093
     volumes:
-      - ../monitoring/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+      - ./monitoring/alertmanager.yml:/etc/alertmanager/alertmanager.yml
     command:
       - '--config.file=/etc/alertmanager/alertmanager.yml'
 

@@ -40,13 +40,13 @@ data "kubernetes_secret_v1" "gitlab_root_password" {
 }
 
 # Wait for 60 sec to obtain LoadBalancer IP
-resource "time_sleep" "gitlab_nginx_lb_wait" {
+resource "time_sleep" "gitlab_ingress_lb_wait" {
   depends_on = [helm_release.gitlab]
   create_duration = "60s"
 }
 
 data "kubernetes_service_v1" "gitlab_ip" {
-  depends_on = [time_sleep.gitlab_nginx_lb_wait]
+  depends_on = [time_sleep.gitlab_ingress_lb_wait]
   metadata {
     name      = "gitlab-nginx-ingress-controller"
     namespace = "gitlab"

@@ -6,7 +6,7 @@ IceCube расположен глубоко в толще антарктичес
 (то есть из-под земли). Эти мюоны могут рождаться только при взаимодействии мюонных нейтрино, прошедших сквозь
 Землю, с электронами и нуклонами льда (и слоя грунта подо льдом, толщиной порядка 1 км).
 
-![Icecube 3D](https://storage.googleapis.com/kaggle-media/competitions/IceCube/icecube_detector.jpg)
+![Icecube 3D](demo/icecube_detector.jpg)
 Приложение помогает определить, с какого направления пришли нейтрино, обнаруженные нейтринной обсерваторией IceCube на основании информации от фотодетекторов, зафиксировавших излучение. В качестве исходных данных имеются координаты фотодатчиков обсерватории (*sensor_geometry.csv*), результаты прошлых исследований с расчетом сферических координат векторов движения нейтрино (*train_meta.parquet, batch_N.parquet*)
 ## UI Demo
 ![Application screecast](demo/playback.gif?raw=true)
@@ -62,16 +62,16 @@ docker compose rm
 
 ## Мониторинг
 - Сбор метрик и проверка состояния компонетов приложения, включая mongodb
-![Icecube Targets](demo/docker_Prometheus)
+![Icecube Targets](demo/docker_Prometheus.png)
 - Алертинг пользователей по факту недоступности комопнентов приложения или высокой латентности входящих запросов
 ![Alertmanager](demo/docker_alert_AlertManager.png)
 - Рассылка пользователям Telegram алертов
-![Telegram](demo/alert_Telegram.png)
+![Telegram](demo/docker_alert_Telegram.png)
 
 ## Доступ к приложениям:
-- Icecube (frontend): http://<docker_host>:8501
-- Prometheus server: http://<docker_host>:9090
-- Prometheus alertmanager: http://<docker_host>:9093
+- Icecube (frontend): [http://<docker_host>:8501](http://<docker_host>:8501)
+- Prometheus server: [http://<docker_host>:9090](http://<docker_host>:9090)
+- Prometheus alertmanager: [http://<docker_host>:9093](http://<docker_host>:9093)
 ___
 
 # Облачные сервисы
@@ -164,6 +164,8 @@ git checkout -b feature/3
 git commit -m "Add review feature"
 git push origin feature/3
 ```
+![Feature pipeline](demo/gitlab_pipeline_feature.png)
+![Feature environment](demo/gitlab_environment_feature.png)
 ## Staging и production среды для работы приложения
 ```
 cd icecube/deploy
@@ -174,14 +176,25 @@ git add .
 git commit -m "Initial commit"
 git push --set-upstream origin main
 ```
+![Deploy pipeline](demo/gitlab_pipeline_deploy.png)
+![Deploy environment](demo/gitlab_environment_deploy.png)
 
 ___
 # Folders
-- `/backend` - Папка с проектом FastAPI
-- `/frontend` - Папка с проектом Streamlit
-- `/config` - Папка, содержащая конфигурационный файл
-- `/data` - Папка, содержащая исходные данные, обработанные данные, уникальные значения в формате JSON, а также неразмеченный файл для подачи на вход модели
-- `/demo` - Папка, содержащая демо работы сервиса в Streamlit UI в формате gif
-- `/models` - Папка, содержащая сохраненную модель после тренировки, а также объект study (Optuna)
-- `/notebooks` - Папка, содержащая jupyter ноутбуки с предварительным анализом данных
-- `/report` - Папка, содержащая информацию о лучших параметрах и метриках после обучения
+- `/compose` - Файлы для сборки приложения и Prometheus через `docker compose`
+    - `/compose/monitoring` - файлы конфигурации Prometheus, Alertmanager для сборки в Docker compose
+- `/demo` - Медиафайлы: скриншоты, скринкасты
+- `/deploy` - Helm-чарты для деплоймента приложения в Kubernetes
+    - `/deploy/frontend` - Helm-чарт компонента frontend
+    - `/deploy/predict` - Helm-чарт компонента predict
+    - `/deploy/train` - Helm-чарт компонента train
+    - `/deploy/icecube` - Helm-чарт всего приложения Icecube, включая зависимости
+    - `/deploy/prometheus` - Helm-чарт для инсталляции и настройки всех компонентов kube-prometheus-stack
+- `/icecube` - Исходники проекта
+    - `/icecube/train` - код Python компонента train, конфигурация бэкэнда, исходные данные, обработанные данные, уникальные значения в формате JSON, а также неразмеченный файл для подачи на вход модели
+    - `/icecube/predict` -  код Python компонента predict, конфигурация бэкэнда, данные для теста модели
+    - `/icecube/frontend` -  код Python компонента frontend, конфигурация фронтэнда
+- `/infra` - скрипты Terraform для инсталляции всех решений в облаке Yandex Cloud
+    - `/infra/cloud` - создание Managed Kubernetes Cluster и Kubernetes Nodes в Yandex Cloud
+    - `/infra/web` - установка NGINX Ingress Controller, Gitlab CE, Prometheus stack в созданном Kubernetes Cluster
+    - `/infra/gitlab` - настройка группы, проектов, групповых переменных Gitlab, деплоймент и регистрация Gitlab Runner, проектных Gitlab Kubernetes Agents

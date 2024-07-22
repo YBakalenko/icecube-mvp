@@ -58,8 +58,8 @@ resource "gitlab_project" "projects" {
 
 module "kas_agents" {
   for_each     = gitlab_project.projects
-  project_id   = gitlab_project.projects[each.key].id # "${each.key}"
-  project_name = gitlab_project.projects[each.key].name # "${each.key}"
+  project_id   = gitlab_project.projects[each.key].id
+  project_name = gitlab_project.projects[each.key].name
   source       = "./modules/agent"
 }
 
@@ -78,7 +78,7 @@ resource "gitlab_group_variable" "ci_registry_password" {
   group             = var.username
   key               = "CI_REGISTRY_PASSWORD"
   value             = var.password
-  protected         = true
+  protected         = false
   masked            = false
   environment_scope = "*"
 }

@@ -16,13 +16,11 @@ terraform apply
 terraform output -raw gitlab_root_password
 ```
 5. Login to Gitlab server [https://gitlab.example.com](https://gitlab.example.com)
-- Create a Gitlab runner (`Admin Area > CI/CD > Runners > New instance runner`) and paste its token to `gitlab/terraform.tfvars` file
-- Create your group and project
-- In your project create a Kubernetes agent (`Project > Operate > Kubernetes clusters > Connect a cluster`) and paste its token to `gitlab/terraform.tfvars` file
-- Update `gitlab_ip` value to math Terraform outputs
-6. Install and register Gitlab runner and Kubernetes agent
+- Create a Personal Access Token (`User Settings > Access Tokens`) and paste its token to `gitlab/terraform.tfvars` file
+6. Create a group, projects, group variables, install and register Gitlab runner and Kubernetes agents
 ```
 cd ../gitlab
 terraform init
 terraform apply
 ```
+Enter your Dockerhub username and password when prompted

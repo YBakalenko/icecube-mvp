@@ -2,7 +2,7 @@ default:
   image: alpine:latest
   hooks:
     pre_get_sources_script:
-      - echo "$CI_GITLAB_IP gitlab.example.com" | tee -a /etc/hosts
+      - echo "$CI_GITLAB_IP $CI_GITLAB_HOST" | tee -a /etc/hosts
 before_script:
   - echo $CI_COMMIT_BRANCH
   - echo $CI_COMMIT_REF_NAME
@@ -19,15 +19,15 @@ build:
   stage: build
   image: docker:27.0.3
   services:
-    - docker:27.0.3-dind
+    - name: docker:27.0.3-dind
+      command: ["--tls=false"]
   variables:
     DOCKER_DRIVER: overlay2
-    DOCKER_HOST: tcp://docker:2376
-    DOCKER_TLS_VERIFY: 1
-    DOCKER_TLS_CERTDIR: "/certs"
-    DOCKER_CERT_PATH: "$DOCKER_TLS_CERTDIR/client"
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
     CI_REGISTRY: 'index.docker.io'
-    CI_APPLICATION_REPOSITORY: $CI_REGISTRY/$CI_PROJECT_PATH
+    CI_APPLICATION_NAME: "icecube"
+    CI_APPLICATION_REPOSITORY: $CI_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_APPLICATION_NAME-$CI_PROJECT_NAME
     CI_APPLICATION_TAG: $CI_COMMIT_REF_SLUG
     CI_CONTAINER_NAME: ci_job_build_${CI_JOB_ID}
   script:
@@ -38,7 +38,7 @@ build:
     - docker build -t "$CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG" . --load
     - >
       if [[ -n "$CI_REGISTRY_USER" ]]; then
-        echo "Logging to GitLab Container Registry with CI credentials...for build"
+        echo "Logging to GitLab Container Registry with CI credentials for build..."
         docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
       fi
     - echo "Pushing to GitLab Container Registry..."
@@ -57,19 +57,19 @@ release:
   stage: release
   image: docker:27.0.3
   services:
-    - docker:27.0.3-dind
+    - name: docker:27.0.3-dind
+      command: ["--tls=false"]
   variables:
     DOCKER_DRIVER: overlay2
-    DOCKER_HOST: tcp://docker:2376
-    DOCKER_TLS_VERIFY: 1
-    DOCKER_TLS_CERTDIR: "/certs"
-    DOCKER_CERT_PATH: "$DOCKER_TLS_CERTDIR/client"
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
     CI_REGISTRY: 'index.docker.io'
-    CI_APPLICATION_REPOSITORY: $CI_REGISTRY/$CI_PROJECT_PATH
+    CI_APPLICATION_NAME: "icecube"
+    CI_APPLICATION_REPOSITORY: $CI_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_APPLICATION_NAME-$CI_PROJECT_NAME
     CI_APPLICATION_TAG: $CI_COMMIT_REF_SLUG
     CI_CONTAINER_NAME: ci_job_build_${CI_JOB_ID}
   script:
-    # Releasing
+    # Releasing.
     - echo "Updating docker images ..."
     - >
       if [[ -n "$CI_REGISTRY_USER" ]]; then
@@ -79,9 +79,6 @@ release:
     - docker pull "$CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG"
     - docker tag "$CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG" "$CI_APPLICATION_REPOSITORY:$(cat VERSION)"
     - docker push "$CI_APPLICATION_REPOSITORY:$(cat VERSION)"
-    # latest is needed for feature flags
-    # - docker tag "$CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG" "$CI_APPLICATION_REPOSITORY:latest"
-    # - docker push "$CI_APPLICATION_REPOSITORY:latest"
   rules:
     - if: $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
@@ -123,7 +120,7 @@ review:
         name="$name-$track"
       fi
     - echo "Clone deploy repository..."
-    - git -c http.sslVerify=false clone https://gitlab.example.com/$CI_PROJECT_NAMESPACE/deploy.git
+    - git -c http.sslVerify=false clone https://$CI_GITLAB_HOST/$CI_PROJECT_NAMESPACE/deploy.git
     - echo "Download helm dependencies..."
     - helm dep update deploy/icecube
     - echo "Deploy helm release $name to $KUBE_NAMESPACE"

@@ -34,6 +34,7 @@ resource "kubernetes_cluster_role_binding_v1" "namespace_admin_binding" {
   subject {
     kind      = "ServiceAccount"
     name      = "default"
+    namespace = "gitlab"
     api_group = ""
   }
 }

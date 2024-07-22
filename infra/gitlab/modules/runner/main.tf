@@ -4,7 +4,7 @@ resource "gitlab_runner" "basic_runner" {
 }
 
 locals {
-  runner_values_yaml_content = templatefile("${path.module}/files/values.yaml.tpl", {
+  runner_values_yaml_content = templatefile("${path.module}/files/values.yaml", {
     gitlab_host  = var.gitlab_host
     gitlab_ip    = var.gitlab_ip
     runner_token = "${gitlab_runner.basic_runner.authentication_token}"
