@@ -150,7 +150,7 @@ ___
 ## Инициализация репозитория
 Коммит в Gitlab на примере сервиса frontend, сборка и релиз приложения в Gitlab CI:
 ```
-cd icecube/forntend
+cd icecube/frontend
 git init --initial-branch=main
 git remote add origin https://gitlab.example.com/ybakalenko/frontend.git
 git config http.sslVerify false

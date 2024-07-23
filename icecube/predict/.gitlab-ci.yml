@@ -48,8 +48,34 @@ build:
 
 test:
   stage: test
+  image: docker:27.0.3
+  services:
+    - name: docker:27.0.3-dind
+      command: ["--tls=false"]
+  variables:
+    CI_APPLICATION_PORT: 9940
+    DOCKER_DRIVER: overlay2
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+  before_script:
+    - apt-get update
+    - apt-get install -y curl
+    - curl -L https://github.com/goss-org/goss/releases/latest/download/goss-linux-amd64 -o /usr/local/bin/goss
+    - chmod +rx /usr/local/bin/goss
+    - curl -L https://github.com/goss-org/goss/releases/latest/download/dgoss -o /usr/local/bin/dgoss
+    - chmod +rx /usr/local/bin/dgoss
   script:
-    - exit 0
+    - echo "Pulling docker image ..."
+    - >
+      if [[ -n "$CI_REGISTRY_USER" ]]; then
+        echo "Logging to GitLab Container Registry with CI credentials for release..."
+        docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
+      fi
+    - docker pull "$CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG"
+    - docker tag "$CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG" "$CI_APPLICATION_REPOSITORY:$(cat VERSION)"
+    - export GOSS_FILES_PATH=./tests
+    - echo "Running dgoss tests..."
+    - dgoss run -p $CI_APPLICATION_PORT:$CI_APPLICATION_PORT "$CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG"
   rules:
     - if: $CI_COMMIT_BRANCH
 

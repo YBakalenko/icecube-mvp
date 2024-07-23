@@ -1,0 +1,73 @@
+file:
+    /app/config/params.yml:
+        exists: true
+        mode: "0744"
+        owner: root
+        group: root
+        filetype: file
+        contents: []
+    /app/data/processed/batches/batches_sample.parquet:
+        exists: true
+        mode: "0744"
+        owner: root
+        group: root
+        filetype: file
+        contents: []
+    /app/data/raw/batches/batches_sample.parquet:
+        exists: true
+        mode: "0644"
+        owner: root
+        group: root
+        filetype: file
+        contents: []
+    /app/data/raw/sensor_geometry.csv:
+        exists: true
+        mode: "0744"
+        owner: root
+        group: root
+        filetype: file
+        contents: []
+    /app/data/raw/train_meta_sample.parquet:
+        exists: true
+        mode: "0644"
+        owner: root
+        group: root
+        filetype: file
+        contents: []
+    /app/main.pyexit:
+        exists: false
+        contents: []
+port:
+    tcp:18507:
+        listening: true
+        ip:
+            - 0.0.0.0
+process:
+    uvicorn:
+        running: true
+http:
+    http://localhost:18507/docs:
+        status: 200
+        allow-insecure: false
+        no-follow-redirects: false
+        timeout: 8000
+    http://localhost:18507/metrics:
+        status: 200
+        allow-insecure: false
+        no-follow-redirects: false
+        timeout: 8000
+    http://localhost:18507/preprocessing_config:
+        status: 200
+        allow-insecure: false
+        no-follow-redirects: false
+        timeout: 8000
+    http://localhost:18507/train_config:
+        status: 200
+        allow-insecure: false
+        no-follow-redirects: false
+        timeout: 8000
+    http://localhost:18507/train_health:
+        status: 200
+        allow-insecure: false
+        no-follow-redirects: false
+        timeout: 10000

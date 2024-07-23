@@ -1,0 +1,58 @@
+file:
+    /app/config/params.yml:
+        exists: true
+        mode: "0775"
+        owner: root
+        group: root
+        filetype: file
+        contents: []
+    /app/data/check/batches/batch_661.parquet:
+        exists: true
+        mode: "0775"
+        owner: root
+        group: root
+        filetype: file
+        contents: []
+    /app/data/check/test_meta.parquet:
+        exists: true
+        mode: "0775"
+        owner: root
+        group: root
+        filetype: file
+        contents: []
+    /app/main.py:
+        exists: true
+        mode: "0775"
+        owner: root
+        group: root
+        filetype: file
+        contents: []
+port:
+    tcp:9940:
+        listening: true
+        ip:
+            - 0.0.0.0
+process:
+    uvicorn:
+        running: true
+http:
+    http://localhost:9940/docs:
+        status: 200
+        allow-insecure: false
+        no-follow-redirects: false
+        timeout: 8000
+    http://localhost:9940/evaluate_config:
+        status: 200
+        allow-insecure: false
+        no-follow-redirects: false
+        timeout: 8000
+    http://localhost:9940/metrics:
+        status: 200
+        allow-insecure: false
+        no-follow-redirects: false
+        timeout: 8000
+    http://localhost:9940/predict_health:
+        status: 200
+        allow-insecure: false
+        no-follow-redirects: false
+        timeout: 10000

@@ -1,0 +1,53 @@
+file:
+    /app/config/params.yml:
+        exists: true
+        mode: "0664"
+        owner: root
+        group: root
+        filetype: file
+        contents: []
+    /app/data/check/batches/batch_661.parquet:
+        exists: true
+        mode: "0775"
+        owner: root
+        group: root
+        filetype: file
+        contents: []
+    /app/data/check/batches/batch_template.parquet:
+        exists: true
+        mode: "0775"
+        owner: root
+        group: root
+        filetype: file
+        contents: []
+    /app/main.py:
+        exists: true
+        mode: "0775"
+        owner: root
+        group: root
+        filetype: file
+        contents: []
+port:
+    tcp:8501:
+        listening: true
+        ip:
+            - 0.0.0.0
+process:
+    streamlit:
+        running: true
+http:
+    http://localhost:8501/:
+        status: 200
+        allow-insecure: false
+        no-follow-redirects: false
+        timeout: 8000
+    http://localhost:8501/_stcore/health:
+        status: 200
+        allow-insecure: false
+        no-follow-redirects: false
+        timeout: 8000
+    http://localhost:8501/_stcore/metrics:
+        status: 200
+        allow-insecure: false
+        no-follow-redirects: false
+        timeout: 8000
