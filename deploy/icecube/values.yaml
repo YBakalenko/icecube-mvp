@@ -22,4 +22,6 @@ frontend:
 # databaseHost: mongodb
 
 mongodb:
-  usePassword: false
+  # usePassword: false
+  auth:
+    enabled: false

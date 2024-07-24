@@ -267,10 +267,13 @@ def pipeline_train() -> None:
     train_status.update('Сохранение результатов', 0)
     joblib.dump(clf, os.path.join(train_cfg['model_path']))
     joblib.dump(study, os.path.join(train_cfg['study_path']))
+    train_status.update('Сохранение результатов', 0.02)
 
     # save result to mongo and also save config to mongo
     insert_file(db_cfg['fs']['model'], train_cfg['model_path'], replace=True)
     insert_file(db_cfg['fs']['study'], train_cfg['study_path'], replace=True)
+    train_status.update('Сохранение результатов', 0.03)
+
 
     # save config to mongo
     insert_data(db_cfg['collection'], db_cfg['objects']['train_config'], train_cfg, replace=True)

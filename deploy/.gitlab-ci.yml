@@ -39,6 +39,7 @@ test:
     - echo $KUBE_NAMESPACE
     - export track="${1-stable}"
     - helm repo add stable https://charts.helm.sh/stable
+    - helm repo add bitnami https://charts.bitnami.com/bitnami
     - helm dep build icecube
     - >
       helm upgrade $RELEASE_NAME ./icecube \
@@ -92,6 +93,7 @@ staging:
     - echo $KUBE_NAMESPACE
     - export track="${1-stable}"
     - export name="$CI_ENVIRONMENT_SLUG"
+    - helm repo add bitnami https://charts.bitnami.com/bitnami
     - helm repo add stable https://charts.helm.sh/stable
     - helm dep build icecube
     - >
@@ -139,6 +141,7 @@ production:
     - echo $KUBE_NAMESPACE
     - export track="${1-stable}"
     - export name="$CI_ENVIRONMENT_SLUG"
+    - helm repo add bitnami https://charts.bitnami.com/bitnami
     - helm repo add stable https://charts.helm.sh/stable
     - helm dep build icecube
     - >
