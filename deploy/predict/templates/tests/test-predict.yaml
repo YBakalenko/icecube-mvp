@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ template "predict.fullname" . }}-test
+  labels:
+    app: icecube
+    component: test
+    release: {{ .Release.Name }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": hook-succeeded, hook-failed
+spec:
+  containers:
+    - name: {{ template "predict.fullname" . }}-test-endpoint
+      image: alpine
+      command: ['/bin/sh']
+      args: ['-c', 'apk add --no-cache jq && wget -qO- http://{{ template "predict.fullname" . }}:{{ .Values.service.externalPort }}/predict_health | jq -e ".backend == true and .database == true" >/dev/null && exit 0 || exit 1']
+
+  restartPolicy: Never

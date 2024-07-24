@@ -54,12 +54,22 @@ test:
       command: ["--tls=false"]
   variables:
     CI_APPLICATION_PORT: 18507
+    CI_REGISTRY: 'index.docker.io'
+    CI_APPLICATION_NAME: "icecube"
+    CI_APPLICATION_REPOSITORY: $CI_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_APPLICATION_NAME-$CI_PROJECT_NAME
+    CI_APPLICATION_TAG: $CI_COMMIT_REF_SLUG
+    GOSS_FILES_STRATEGY: cp
+    GOSS_FILES_PATH: ./tests
     DOCKER_DRIVER: overlay2
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
   before_script:
-    - apt-get update
-    - apt-get install -y curl
+    - apk add -U openssl curl tar gzip bash ca-certificates git
+    - wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub
+    - wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.35-r1/glibc-2.35-r1.apk
+    - apk add glibc-2.35-r1.apk
+    - rm glibc-2.35-r1.apk
+    - apk add --no-cache curl
     - curl -L https://github.com/goss-org/goss/releases/latest/download/goss-linux-amd64 -o /usr/local/bin/goss
     - chmod +rx /usr/local/bin/goss
     - curl -L https://github.com/goss-org/goss/releases/latest/download/dgoss -o /usr/local/bin/dgoss
@@ -73,17 +83,8 @@ test:
       fi
     - docker pull "$CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG"
     - docker tag "$CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG" "$CI_APPLICATION_REPOSITORY:$(cat VERSION)"
-    - export GOSS_FILES_PATH=./tests
     - echo "Running dgoss tests..."
     - dgoss run -p $CI_APPLICATION_PORT:$CI_APPLICATION_PORT "$CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG"
-  rules:
-    - if: $CI_COMMIT_BRANCH
-
-
-
-  stage: test
-  script:
-    - exit 0
   rules:
     - if: $CI_COMMIT_BRANCH
 

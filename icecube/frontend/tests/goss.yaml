@@ -1,28 +1,24 @@
 file:
     /app/config/params.yml:
         exists: true
-        mode: "0664"
         owner: root
         group: root
         filetype: file
         contents: []
     /app/data/check/batches/batch_661.parquet:
         exists: true
-        mode: "0775"
         owner: root
         group: root
         filetype: file
         contents: []
     /app/data/check/batches/batch_template.parquet:
         exists: true
-        mode: "0775"
         owner: root
         group: root
         filetype: file
         contents: []
     /app/main.py:
         exists: true
-        mode: "0775"
         owner: root
         group: root
         filetype: file

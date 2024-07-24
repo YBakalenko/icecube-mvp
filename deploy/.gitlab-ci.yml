@@ -14,8 +14,48 @@ stages:
 
 test:
   stage: test
+  variables:
+    CI_REGISTRY: 'index.docker.io'
+    CI_APPLICATION_REPOSITORY: $CI_REGISTRY/$CI_PROJECT_PATH
+    CI_APPLICATION_TAG: $CI_COMMIT_REF_SLUG
+    CI_CONTAINER_NAME: ci_job_build_${CI_JOB_ID}
+    RELEASE_NAME: icecube
+    KUBE_NAMESPACE: testing
+  before_script:
+  # installing dependencies
+    - apk add -U openssl curl tar gzip bash ca-certificates git
+    - wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub
+    - wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.35-r1/glibc-2.35-r1.apk
+    - apk add glibc-2.35-r1.apk
+    - rm glibc-2.35-r1.apk
+    - curl https://get.helm.sh/helm-v3.15.2-linux-amd64.tar.gz | tar zx
+    - mv linux-amd64/helm /usr/bin/
+    - helm version --client
+    - curl -L -o /usr/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+    - chmod +x /usr/bin/kubectl
+    - kubectl version --client
+    # ensure_namespace
+    - kubectl describe namespace "$KUBE_NAMESPACE" || kubectl create namespace "$KUBE_NAMESPACE"
+    - echo $KUBE_NAMESPACE
+    - export track="${1-stable}"
+    - helm repo add stable https://charts.helm.sh/stable
+    - helm dep build icecube
+    - >
+      helm upgrade $RELEASE_NAME ./icecube \
+        --install \
+        --wait \
+        --set frontend.ingress.host="$host" \
+        --set frontend.image.tag="$(curl -k https://$CI_GITLAB_HOST/$CI_PROJECT_NAMESPACE/frontend/raw/$CI_DEFAULT_BRANCH/VERSION)" \
+        --set train.image.tag="$(curl -k https://$CI_GITLAB_HOST/$CI_PROJECT_NAMESPACE/train/raw/$CI_DEFAULT_BRANCH/VERSION)" \
+        --set predict.image.tag="$(curl -k https://$CI_GITLAB_HOST/$CI_PROJECT_NAMESPACE/predict/raw/$CI_DEFAULT_BRANCH/VERSION)" \
+        --namespace="$KUBE_NAMESPACE" \
+        --version="$CI_PIPELINE_ID-$CI_JOB_ID"
   script:
-    - exit 0
+    - helm test $RELEASE_NAME -n $KUBE_NAMESPACE
+  after_script:
+    - helm uninstall $RELEASE_NAME -n $KUBE_NAMESPACE --wait || true
+    - kubectl delete namespace $KUBE_NAMESPACE || true
+    - sleep 1m
   rules:
     - if: $CI_PIPELINE_SOURCE == "trigger"
     - if: $CI_COMMIT_BRANCH
@@ -55,7 +95,7 @@ staging:
     - helm repo add stable https://charts.helm.sh/stable
     - helm dep build icecube
     - >
-      helm upgrade \
+      helm upgrade "$name" ./icecube \
         --install \
         --wait \
         --set frontend.ingress.host="$host" \
@@ -64,8 +104,6 @@ staging:
         --set predict.image.tag="$(curl -k https://$CI_GITLAB_HOST/$CI_PROJECT_NAMESPACE/predict/raw/$CI_DEFAULT_BRANCH/VERSION)" \
         --namespace="$KUBE_NAMESPACE" \
         --version="$CI_PIPELINE_ID-$CI_JOB_ID" \
-        "$name" \
-        icecube \
   rules:
     - if: $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH #&& $CI_KUBERNETES_ACTIVE == 'true' (with Premium)
 
@@ -104,7 +142,7 @@ production:
     - helm repo add stable https://charts.helm.sh/stable
     - helm dep build icecube
     - >
-      helm upgrade \
+      helm upgrade "$name" ./icecube \
         --install \
         --wait \
         --set frontend.ingress.host="$host" \
@@ -113,8 +151,6 @@ production:
         --set predict.image.tag="$(curl -k https://$CI_GITLAB_HOST/$CI_PROJECT_NAMESPACE/predict/raw/$CI_DEFAULT_BRANCH/VERSION)" \
         --namespace="$KUBE_NAMESPACE" \
         --version="$CI_PIPELINE_ID-$CI_JOB_ID" \
-        "$name" \
-        icecube \
   when: manual
   rules:
     - if: $CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH #&& $CI_KUBERNETES_ACTIVE == 'true' (with Premium)

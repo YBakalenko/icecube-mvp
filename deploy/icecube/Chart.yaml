@@ -1,3 +1,4 @@
+apiVersion: v1
 name: icecube
 version: 1.0.0
 description: IceCube application

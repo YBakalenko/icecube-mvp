@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ template "frontend.fullname" . }}-test
+  labels:
+    app: icecube
+    component: test
+    release: {{ .Release.Name }}
+  annotations:
+    "helm.sh/hook": test
+    #"helm.sh/hook-delete-policy": hook-succeeded, hook-failed
+spec:
+  containers:
+    - name: {{ template "frontend.fullname" . }}-test-endpoint
+      image: busybox
+      command: ['wget']
+      args: ['--spider', '--timeout=8', 'http://{{ template "frontend.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.externalPort }}']
+
+  restartPolicy: Never

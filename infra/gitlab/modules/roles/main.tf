@@ -6,8 +6,8 @@ resource "kubernetes_cluster_role_v1" "namespace_admin" {
 
   rule {
     api_groups = [""]
-    resources  = ["namespaces", "resourcequotas", "limitranges", "secrets", "persistentvolumes", "persistentvolumeclaims", "services"]
-    verbs      = ["get", "create", "list", "watch", "delete"]
+    resources  = ["pods", "namespaces", "resourcequotas", "limitranges", "secrets", "persistentvolumes", "persistentvolumeclaims", "services"]
+    verbs      = ["get", "create", "list", "watch", "delete", "update"]
   }
   rule {
     api_groups = ["networking.k8s.io"]

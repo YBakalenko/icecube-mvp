@@ -1,35 +1,30 @@
 file:
     /app/config/params.yml:
         exists: true
-        mode: "0744"
         owner: root
         group: root
         filetype: file
         contents: []
     /app/data/processed/batches/batches_sample.parquet:
         exists: true
-        mode: "0744"
         owner: root
         group: root
         filetype: file
         contents: []
     /app/data/raw/batches/batches_sample.parquet:
         exists: true
-        mode: "0644"
         owner: root
         group: root
         filetype: file
         contents: []
     /app/data/raw/sensor_geometry.csv:
         exists: true
-        mode: "0744"
         owner: root
         group: root
         filetype: file
         contents: []
     /app/data/raw/train_meta_sample.parquet:
         exists: true
-        mode: "0644"
         owner: root
         group: root
         filetype: file
