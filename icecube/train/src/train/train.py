@@ -11,6 +11,7 @@ import optuna
 from optuna import Study
 from typing import Tuple
 import joblib
+from io import BytesIO
 from ..data.split_dataset import get_train_test_data
 from ..train.metrics import save_metrics, get_metrics
 from ..data.get_data import read_config, get_batch
@@ -273,7 +274,6 @@ def pipeline_train() -> None:
     insert_file(db_cfg['fs']['model'], train_cfg['model_path'], replace=True)
     insert_file(db_cfg['fs']['study'], train_cfg['study_path'], replace=True)
     train_status.update('Сохранение результатов', 0.03)
-
 
     # save config to mongo
     insert_data(db_cfg['collection'], db_cfg['objects']['train_config'], train_cfg, replace=True)
