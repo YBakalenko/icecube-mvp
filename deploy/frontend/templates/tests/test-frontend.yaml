@@ -4,11 +4,11 @@ metadata:
   name: {{ template "frontend.fullname" . }}-test
   labels:
     app: icecube
-    component: test
+    component: frontend
     release: {{ .Release.Name }}
   annotations:
     "helm.sh/hook": test
-    #"helm.sh/hook-delete-policy": hook-succeeded, hook-failed
+    "helm.sh/hook-delete-policy": hook-succeeded, hook-failed
 spec:
   containers:
     - name: {{ template "frontend.fullname" . }}-test-endpoint

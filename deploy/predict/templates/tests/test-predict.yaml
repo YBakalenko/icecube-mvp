@@ -4,7 +4,7 @@ metadata:
   name: {{ template "predict.fullname" . }}-test
   labels:
     app: icecube
-    component: test
+    component: predict
     release: {{ .Release.Name }}
   annotations:
     "helm.sh/hook": test

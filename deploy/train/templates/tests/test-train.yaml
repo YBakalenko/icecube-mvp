@@ -4,7 +4,7 @@ metadata:
   name: {{ template "train.fullname" . }}-test
   labels:
     app: icecube
-    component: test
+    component: train
     release: {{ .Release.Name }}
   annotations:
     "helm.sh/hook": test

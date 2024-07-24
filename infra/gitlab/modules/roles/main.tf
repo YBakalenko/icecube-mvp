@@ -6,7 +6,7 @@ resource "kubernetes_cluster_role_v1" "namespace_admin" {
 
   rule {
     api_groups = [""]
-    resources  = ["pods", "namespaces", "resourcequotas", "limitranges", "secrets", "persistentvolumes", "persistentvolumeclaims", "services"]
+    resources  = ["pods", "namespaces", "resourcequotas", "limitranges", "secrets", "persistentvolumes", "persistentvolumeclaims", "services", "serviceaccounts", "configmaps"]
     verbs      = ["get", "create", "list", "watch", "delete", "update"]
   }
   rule {
