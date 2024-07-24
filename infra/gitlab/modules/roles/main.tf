@@ -19,6 +19,11 @@ resource "kubernetes_cluster_role_v1" "namespace_admin" {
     resources  = ["deployments", "replicasets"]
     verbs      = ["get", "create", "list", "watch"]
   }
+  rule {
+    api_groups = ["policy"]
+    resources  = ["poddisruptionbudgets"]
+    verbs      = ["get", "create", "list", "watch", "delete", "update"]
+  }
 }
 
 resource "kubernetes_cluster_role_binding_v1" "namespace_admin_binding" {
